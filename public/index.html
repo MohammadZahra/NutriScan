@@ -1,12 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Project-One</title>
+  <title>NutriScan</title>
   <link rel="stylesheet" href="dist/css/custom.css"> <!-- Link to the compiled CSS -->
 </head>
-<body>
-  <h1>Hello, World!</h1>
+
+<body class="bg-light">
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-sm bg-dark shadow navbar-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <img src="dist/img/logo-transparent-svg.svg" alt="Nutrition Facts Finder" style="width:120px;">
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="collapsibleNavbar">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="#">Articles</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Contact</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">About</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Search, Scan & Output Container -->
+  <div class="container mt-4">
+    <form>
+      <div class="input-group mb-3">
+        <input type="number" id="eanInput" class="form-control" placeholder="Enter EAN" required>
+        <div>
+          <button type="button" id="scanButton" class="btn btn-outline-secondary">Scan Barcode</button>
+        </div>
+      </div>
+      <div class="mb-3">
+        <button type="submit" id="searchButton" class="btn btn-primary">Search</button>
+      </div>
+    </form>
+    <div id="qrCodeScanner" class="col-md-8 mt-4"></div>
+    <div id="output" class="mt-4"></div>
+  </div>
+
+  <script src="dist/js/bundle.js"></script> <!-- Include the bundle.js file -->
 </body>
+
 </html>

@@ -4,6 +4,7 @@
     "module": "commonjs",               // Use CommonJS module system
     "strict": true,                     // Enable strict type-checking options to make the code more reliable.
     "outDir": "./dist/js",              // Output the compiled JS files to /dist/js
+    "esModuleInterop": true,            // Enable compatibility with CommonJS
 },
 "include": ["./src/**/*.ts"],           // Include all TypeScript files in /src folder
 "exclude": ["node_modules"]             // Exclude node_modules from compilation to avoid compiling third-party libraries

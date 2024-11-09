@@ -12,12 +12,15 @@
   "author": "MohammadZahra",
   "license": "ISC",
   "devDependencies": {
+    "@types/jquery": "^3.5.32",
     "concurrently": "^9.0.1",
+    "html5-qrcode": "^2.3.8",
     "ts-loader": "^9.5.1",
     "webpack": "^5.95.0",
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "bootstrap": "^5.3.3"
+    "bootstrap": "^5.3.3",
+    "jquery": "^3.7.1"
   }
 }
