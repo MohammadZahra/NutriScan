@@ -1,11 +1,6 @@
 import 'bootstrap';
 import $ from 'jquery';
-import { Html5Qrcode, Html5QrcodeScanner } from "html5-qrcode";
-
-
-/** SETUP **/
-/***********/
-const useScannerWithUI = true; //Flag to toggle between the two scanners
+import { Html5QrcodeScanner } from "html5-qrcode";
 
 
 /** DEFINE INTERFACES **/
@@ -113,34 +108,21 @@ async function fetchProductData(ean: string): Promise<ApiResponse> {
 function initializeQrcodeScanner() {
     const scanner = new Html5QrcodeScanner(
         "qrCodeScanner",
-        { fps: 10, qrbox: { width: 500, height: 500 } },
+        { fps: 10, qrbox: { width: 400, height: 400 } },
         false
     );
     scanner.render(
-        (decodedText) => {
+        (decodedText, decodedResult) => { //onScanSuccess
+            console.log(`Code matched: ${decodedText}`, decodedResult);
             $('#eanInput').val(decodedText); 
             processEAN(decodedText);
             scanner.clear();  
             $("#qrCodeScanner").hide();
         },
-        (errorMessage) => {
-            console.log("QR Code no match:", errorMessage);
+        (error) => { //onScanFailure
+            console.log(`Code scan error: ${error}`);
         }
     );
-}
-
-function initializeQrcode() {
-    const scanner = new Html5Qrcode("qrCodeScanner");
-    scanner.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: { width: 500, height: 500 } },
-        async (decodedText) => {
-            await processEAN(decodedText);
-            scanner.stop();
-            $("#qrCodeScanner").hide();
-        },
-        (errorMessage) => console.log("QR Code no match:", errorMessage)
-    ).catch(error => alert("Error accessing camera: " + error));
 }
 
 async function processEAN(ean: string): Promise<void> {
@@ -167,7 +149,7 @@ function setupEventListeners() {
     });
     $("#scanButton").on("click", () => {
         $("#qrCodeScanner").show();
-        useScannerWithUI ? initializeQrcodeScanner() : initializeQrcode();
+        initializeQrcodeScanner();
     });
 }
 
