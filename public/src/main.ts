@@ -53,13 +53,13 @@ function displayProductData(product: Product): void {
           <div class="card-body">
               <div class="row">
                   <div class="col-sm-4">
-                      <img src="${product.image_url || ''}" alt="${product.product_name || ''}" class="img-fluid mb-3" style="max-width: 150px;">
+                      <img src="${product.image_url || ''}" alt="${product.product_name || ''}" class="img-fluid mb-3" style="max-width: 150px; max-height: 250px;">
                       <div class="mb-4">
-                          <p><strong>Eco-Score:</strong> ${product.ecoscore_grade?.toUpperCase() || 'N/A'}</p>
+                          <p><strong>Eco-Score:</strong> ${product.ecoscore_grade?.toUpperCase() || 'unavailable'}</p>
                           ${ecoScoreImage}
                       </div>
                       <div class="mb-4">
-                          <p><strong>Nutri-Score:</strong> ${product.nutrition_grades?.toUpperCase() || 'N/A'}</p>
+                          <p><strong>Nutri-Score:</strong> ${product.nutrition_grades?.toUpperCase() || 'unavailable'}</p>
                           ${nutriScoreImage}
                       </div>
                   </div>
@@ -89,20 +89,6 @@ function displayProductData(product: Product): void {
 
 
 
-/** FETCH PRODUCT DATA BY EAN NUMBER **/
-/**************************************/
-async function fetchProductData(ean: string): Promise<ApiResponse> {
-    const apiUrl = `https://world.openfoodfacts.org/api/v2/product/${ean}?fields=product_name,image_url,nutrition_grades,ecoscore_grade,nutriments,ingredients_text,allergens_tags`;
-    try {
-        const response = await $.getJSON(apiUrl);
-        return response as ApiResponse;
-    } catch (error) {
-        console.error("Error fetching product data:", error);
-        throw new Error('Data retrieval failed. Please try again.');
-    }
-}
-
-
 /** PROCESS SCANNER AND INPUT **/
 /*******************************/
 function initializeQrcodeScanner() {
@@ -125,21 +111,27 @@ function initializeQrcodeScanner() {
     );
 }
 
-async function processEAN(ean: string): Promise<void> {
+function processEAN(ean: string | null): void {
     if (!ean) {
         $('#output').text('Please enter or scan a valid EAN code.');
         return;
     }
-    try {
-        const data = await fetchProductData(ean);
-        if (data.status === 1 && data.product) {
-            displayProductData(data.product);
-        } else {
-            $('#output').text('Product information not available.');
-        }
-    } catch {
-        $('#output').text('Error retrieving product information.');
-    }
+
+    const apiUrl = `https://world.openfoodfacts.org/api/v2/product/${ean}?fields=product_name,image_url,nutrition_grades,ecoscore_grade,nutriments,ingredients_text,allergens_tags`;
+
+    $.ajax({
+        url: apiUrl,
+        method: 'GET',
+        dataType: 'json',
+        success: (data: ApiResponse) => {
+            if (data.status === 1 && data.product) {
+                displayProductData(data.product);
+            } else {
+                $('#output').text('Product information not available.');
+            }
+        },
+        error: () => {$('#output').text('Error retrieving product information.');}
+    });
 }
 
 function setupEventListeners() {
