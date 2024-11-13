@@ -103,7 +103,6 @@ function initializeQrcodeScanner() {
             $('#eanInput').val(decodedText); 
             processEAN(decodedText);
             scanner.clear();  
-            $("#qrCodeScanner").hide();
         },
         (error) => { //onScanFailure
             console.log(`Code scan error: ${error}`);
@@ -135,12 +134,13 @@ function processEAN(ean: string | null): void {
 }
 
 function setupEventListeners() {
-    $('#searchButton').on('click', () => {
+    $('form').on('submit', () => {
         const ean = $('#eanInput').val() as string;
         processEAN(ean);
+        return false;
     });
+
     $("#scanButton").on("click", () => {
-        $("#qrCodeScanner").show();
         initializeQrcodeScanner();
     });
 }
