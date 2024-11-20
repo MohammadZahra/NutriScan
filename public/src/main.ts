@@ -134,10 +134,10 @@ function processEAN(ean: string | null): void {
 }
 
 function setupEventListeners() {
-    $('form').on('submit', () => {
+    $('form').on('submit', (event) => {
+        event.preventDefault();  
         const ean = $('#eanInput').val() as string;
         processEAN(ean);
-        return false;
     });
 
     $("#scanButton").on("click", () => {
