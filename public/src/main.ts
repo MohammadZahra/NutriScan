@@ -1,33 +1,8 @@
 import 'bootstrap';
 import $ from 'jquery';
 import { Html5QrcodeScanner } from "html5-qrcode";
-
-
-/** DEFINE INTERFACES **/
-/***********************/
-interface ApiResponse {
-    product?: Product;
-    status: number;
-    status_verbose: string;
-}
-interface Product {
-    product_name?: string;
-    image_url?: string;
-    nutrition_grades?: string;
-    ecoscore_grade?: string;
-    nutriments?: Nutriments;
-    ingredients_text?: string;
-    allergens_tags?: string[];
-}
-interface Nutriments {
-    "energy-kcal"?: number;
-    proteins?: number;
-    carbohydrates?: number;
-    fat?: number;
-    sugars?: number;
-    fiber?: number;
-    sodium?: number;
-}
+import { Product, ApiResponse, Nutriments } from './interfaces';
+import { saveScanItem, getScanItems } from './apiService';
 
 
 /** DISPLAY PRODUCT DATA **/
@@ -40,6 +15,7 @@ function generateScoreImage(score: string | undefined, type: string): string {
 }
 
 function displayProductData(product: Product): void {
+    const nutriments = product.nutriments || {};
     const ecoScoreImage = generateScoreImage(product.ecoscore_grade, 'ecoscore');
     const nutriScoreImage = generateScoreImage(product.nutrition_grades, 'nutriscore');
 
@@ -52,7 +28,7 @@ function displayProductData(product: Product): void {
           </div>
           <div class="card-body">
               <div class="row">
-                  <div class="col-sm-4">
+                  <div class="col-md-3">
                       <img src="${product.image_url || ''}" alt="${product.product_name || ''}" class="img-fluid mb-3" style="max-width: 150px; max-height: 250px;">
                       <div class="mb-4">
                           <p><strong>Eco-Score:</strong> ${product.ecoscore_grade?.toUpperCase() || 'unavailable'}</p>
@@ -63,17 +39,17 @@ function displayProductData(product: Product): void {
                           ${nutriScoreImage}
                       </div>
                   </div>
-                  <div class="col-sm-8">
+                  <div class="col-md-5">
                         <div class="table-responsive rounded">
                             <table class="table table-striped table-bordered">
                                 <tbody>
-                                    ${product.nutriments?.['energy-kcal'] ? `<tr><th>Calories</th><td>${product.nutriments['energy-kcal']} kcal</td></tr>` : ''}
-                                    ${product.nutriments?.proteins ? `<tr><th>Proteins</th><td>${product.nutriments.proteins} g</td></tr>` : ''}
-                                    ${product.nutriments?.carbohydrates ? `<tr><th>Carbohydrates</th><td>${product.nutriments.carbohydrates} g</td></tr>` : ''}
-                                    ${product.nutriments?.fat ? `<tr><th>Fats</th><td>${product.nutriments.fat} g</td></tr>` : ''}
-                                    ${product.nutriments?.sugars ? `<tr><th>Sugars</th><td>${product.nutriments.sugars} g</td></tr>` : ''}
-                                    ${product.nutriments?.fiber ? `<tr><th>Fiber</th><td>${product.nutriments.fiber} g</td></tr>` : ''}
-                                    ${product.nutriments?.sodium ? `<tr><th>Sodium</th><td>${product.nutriments.sodium} mg</td></tr>` : ''}
+                                    ${nutriments['energy-kcal'] ? `<tr><th>Calories</th><td>${nutriments['energy-kcal']} kcal</td></tr>` : ''}
+                                    ${nutriments.proteins ? `<tr><th>Proteins</th><td>${nutriments.proteins} g</td></tr>` : ''}
+                                    ${nutriments.carbohydrates ? `<tr><th>Carbohydrates</th><td>${nutriments.carbohydrates} g</td></tr>` : ''}
+                                    ${nutriments.fat ? `<tr><th>Fats</th><td>${nutriments.fat} g</td></tr>` : ''}
+                                    ${nutriments.sugars ? `<tr><th>Sugars</th><td>${nutriments.sugars} g</td></tr>` : ''}
+                                    ${nutriments.fiber ? `<tr><th>Fiber</th><td>${nutriments.fiber} g</td></tr>` : ''}
+                                    ${nutriments.sodium ? `<tr><th>Sodium</th><td>${nutriments.sodium} mg</td></tr>` : ''}
                                     ${product.ingredients_text ? `<tr><th>Ingredients</th><td>${product.ingredients_text}</td></tr>` : ''}
                                     ${product.allergens_tags?.length ? `<tr><th>Allergens</th><td>${product.allergens_tags.map(allergen => allergen.replace('en:', '')).join(', ')}</td></tr>` : ''}
                                 </tbody>
@@ -116,7 +92,7 @@ function processEAN(ean: string | null): void {
         return;
     }
 
-    const apiUrl = `https://world.openfoodfacts.org/api/v2/product/${ean}?fields=product_name,image_url,nutrition_grades,ecoscore_grade,nutriments,ingredients_text,allergens_tags`;
+    const apiUrl = `https://world.openfoodfacts.org/api/v2/product/${ean}?fields=product_name,image_url,nutriscore_score,nutrition_grades,ecoscore_score,ecoscore_grade,nutriments,ingredients_text,allergens_tags`;
 
     $.ajax({
         url: apiUrl,
@@ -124,7 +100,9 @@ function processEAN(ean: string | null): void {
         dataType: 'json',
         success: (data: ApiResponse) => {
             if (data.status === 1 && data.product) {
+                // console.log('Product retrieved:', data.product);
                 displayProductData(data.product);
+                saveScanItem(data.product);
             } else {
                 $('#output').text('Product information not available.');
             }
@@ -133,7 +111,9 @@ function processEAN(ean: string | null): void {
     });
 }
 
+
 function setupEventListeners() {
+    // displayScanHistory();
     $('form').on('submit', (event) => {
         event.preventDefault();  
         const ean = $('#eanInput').val() as string;
@@ -146,3 +126,6 @@ function setupEventListeners() {
 }
 
 $(setupEventListeners);
+
+
+
