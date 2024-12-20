@@ -1,16 +1,16 @@
 import { Request, Response } from 'express';
 import { prisma } from "../server";
 
-declare module 'express-session' {
-    interface SessionData {
-        nutritionScoreViews?: number;
-    }
-}
 
 const getNutritionScoreAverage = async (req: Request, res: Response) => {
     try {
+        const userId = req.session.userId;
+    
         const categories = await prisma.scanItems.groupBy({
             by: ['nutriScoreCategory'],
+            where: {
+                userId: userId 
+            },
             _count: {
                 nutriScoreCategory: true
             },
@@ -24,14 +24,7 @@ const getNutritionScoreAverage = async (req: Request, res: Response) => {
             count: category._count.nutriScoreCategory
         }));
 
-        res.status(200).json({
-            success: true,
-            data: formattedScores,
-            sessionInfo: {
-                viewCount: req.session.nutritionScoreViews,
-                lastViewed: new Date()
-            }
-        });
+        res.status(200).json(formattedScores);
         
     } catch (error) {
         console.error("Error retrieving scan items:", error);

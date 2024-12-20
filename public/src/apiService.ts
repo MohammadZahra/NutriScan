@@ -1,9 +1,10 @@
 import $ from 'jquery';
-import { Product } from './interfaces';
+import { io } from "socket.io-client";
+import { Product, ScanItemResponse } from './interfaces';
 
 
 // Backend API base URL
-const backendApiUrl = "http://localhost:3000/api";
+const backendApiUrl = "http://localhost:8000/api";
 
 
 /**
@@ -13,7 +14,7 @@ const backendApiUrl = "http://localhost:3000/api";
 export function saveScanItem(product: Product): void {
     const requestData = {
         name: product.product_name,
-        ean: $('#eanInput').val() as string, 
+        ean: $('#eanInput').val() as string,
         ecoScore: product.ecoscore_score,
         ecoScoreCategory: product.ecoscore_grade,
         nutriScore: product.nutriscore_score,
@@ -32,6 +33,9 @@ export function saveScanItem(product: Product): void {
     $.ajax({
         url: `${backendApiUrl}/scanItem`,
         method: 'POST',
+        xhrFields: {
+            withCredentials: true // Enables sending cookies
+        },
         contentType: 'application/json',
         data: JSON.stringify(requestData),
         success: (response) => {
@@ -44,21 +48,41 @@ export function saveScanItem(product: Product): void {
 }
 
 
-/**
- * Fetch a scan item from the backend.
- * @returns A Promise that resolves to the list of all scan items.
- */
-export function getScanItems(): Promise<Product[]> {
+export function getScanItems(): Promise<{ items: ScanItemResponse[] }> {
     return new Promise((resolve, reject) => {
         $.ajax({
-            url: `${backendApiUrl}/scanItem`, 
+            url: `${backendApiUrl}/scanItem`,
             method: 'GET',
+            xhrFields: {
+                withCredentials: true // Enables sending cookies
+            },
             dataType: 'json',
             success: (data) => {
                 resolve(data);
             },
             error: (error) => {
                 console.error('Error fetching scan items:', error);
+                reject(error);
+            }
+        });
+    });
+}
+
+
+export function getAverageNutritionScore(): Promise<{ category: string, count: number }[]> {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: `${backendApiUrl}/nutritionScore/average`,
+            method: 'GET',
+            xhrFields: {
+                withCredentials: true // Enables sending cookies
+            },
+            dataType: 'json',
+            success: (data) => {
+                resolve(data);
+            },
+            error: (error) => {
+                console.error('Error fetching average nutrition scores:', error);
                 reject(error);
             }
         });

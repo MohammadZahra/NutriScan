@@ -1,5 +1,27 @@
-@import "../node_modules/bootstrap/scss/bootstrap";
+details {
+    // margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 0.5rem;
 
+    summary {
+        // font-weight: bold;
+        cursor: pointer;
+        outline: none;
+
+        // &:hover {
+        // color: #007bff;
+        // }
+    }
+
+    &[open] {
+        // border-color: #007bff;
+
+        div {
+        margin-top: 0.2rem;
+        }
+    }
+}
 
 #cardHeader {
     background-color: brown;
@@ -8,3 +30,6 @@
 body {
     background-color: brown;
 } 
+
+@import "../node_modules/bootstrap/scss/bootstrap";
+

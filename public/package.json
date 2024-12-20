@@ -6,8 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "sass scss/custom.scss dist/css/custom.css && npx webpack",
-    "start": "npm run build && ws",
-    "watch": "concurrently \"sass --watch scss:/dist/css\" \"npx webpack --mode development --watch\""
+    "start": "npm run build && ws --port 3000",
+    "watch": "concurrently \"sass --watch scss:/dist/css\" \"npx webpack --mode development --watch\"",
+    "dev": "concurrently \"npm run watch\" \"ws --port 3000\""
   },
   "author": "MohammadZahra",
   "license": "ISC",
@@ -21,6 +22,8 @@
   },
   "dependencies": {
     "bootstrap": "^5.3.3",
-    "jquery": "^3.7.1"
+    "chart.js": "^4.4.7",
+    "jquery": "^3.7.1",
+    "socket.io-client": "^4.8.1"
   }
 }

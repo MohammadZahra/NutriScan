@@ -37,20 +37,40 @@
 
   <!-- Search, Scan & Output Container -->
   <div class="container mt-4">
-    <form>
-      <div class="input-group mb-3">
-        <input type="number" id="eanInput" class="form-control" placeholder="Enter EAN" required>
-        <div>
-          <button type="button" id="scanButton" class="btn btn-outline-secondary">Scan Barcode</button>
-        </div>
+
+    <div class="row">
+      <div class="col-sm-9">
+        <form>
+          <div class="input-group mb-3">
+            <input type="number" id="eanInput" class="form-control" placeholder="Enter EAN" required>
+            <div>
+              <button type="button" id="scanButton" class="btn btn-outline-secondary">Scan Barcode</button>
+            </div>
+          </div>
+          <div class="mb-3">
+            <button type="submit" id="searchButton" class="btn btn-primary">Search</button>
+            <div id="qrCodeScanner" class="col-sm-6 mt-4" width="500px"></div>
+          </div>
+        </form>
       </div>
-      <div class="mb-3">
-        <button type="submit" id="searchButton" class="btn btn-primary">Search</button>
+      <div class="col-sm-3">
+        <canvas id="chartId" aria-label="chart" height="250" width="380" style="display: none;"></canvas>
       </div>
-    </form>
-    <div id="qrCodeScanner" class="col-sm-6 mt-4" width="500px"></div>
-    <div id="output" class="mt-4"></div>
-    <div id="history" class="mt-4" style="display: none;"></div>
+    </div>
+
+    <!-- <div id="qrCodeScanner" class="col-sm-6 mt-4" width="500px"></div> -->
+
+    <div class="row">
+      <div class="col-md-6">
+        <div id="output" class="mt-4"></div>
+      </div>
+      <div class="col-md-6" style="display: none;">
+        <hr class="my-4">
+        <h3>Previously Scanned Items</h3>
+        <div id="scannedItems" class="mt-4"></div>
+      </div>
+    </div>
+
   </div>
 
   <script src="dist/js/bundle.js"></script> <!-- Include the bundle.js file -->

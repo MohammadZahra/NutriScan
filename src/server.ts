@@ -3,12 +3,14 @@ import { PrismaClient } from "@prisma/client";
 import cors from 'cors';
 import session from 'express-session';
 import { PrismaSessionStore } from '@quixo3/prisma-session-store';
+import { createServer } from 'http';
+import { initSocket } from "./socket";
 import scanItemRouter from './routes/scanItem.route';
 import nutritionScoreRouter from './routes/nutritionScore.route';
 
 export const prisma = new PrismaClient();
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8000;
 
 
 declare module 'express-session' {
@@ -31,8 +33,11 @@ const loginMiddleware = async (req: Request, res: Response, next: NextFunction) 
 async function main() {
   app.use(express.json());
 
+  const httpServer = createServer(app);
+  const io = initSocket(httpServer);
+
   app.use(cors({
-    origin: 'http://localhost:8000',
+    origin: 'http://localhost:3000',
     methods: 'GET, POST',
     allowedHeaders: 'Content-Type, Authorization',
     credentials: true,
@@ -52,21 +57,21 @@ async function main() {
 
   app.use(loginMiddleware);
 
+  app.use('/api/scanItem', scanItemRouter);
+  app.use('/api/nutritionScore', nutritionScoreRouter);
+
+  httpServer.listen(port, () => {
+    console.log(`Server running on http://localhost:${port}`);
+  });
+
   app.use((req, res, next) => {
     console.log('Incoming session:', req.session);
     next();
   });
-
-  app.use('/api/scanItem', scanItemRouter);
-  app.use('/api/nutritionScore', nutritionScoreRouter);
-
   app.all("*", (req: Request, res: Response) => {
     res.status(404).json({ error: `Route ${req.originalUrl} not found` });
   });
 
-  app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
-  });
 }
 
 
